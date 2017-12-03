@@ -9,7 +9,8 @@ public class QuadraForm implements RealFunc {
 	
 	public QuadraForm(Matrix Q) {
 		this.Q = new Matrix(Q);
-		this.b = new Vector(new double[] {0,0,0,0,0});
+		this.b = new Vector(Q.nb_cols());
+		
 	}
 	public QuadraForm(Matrix Q,Vector b) {
 		this.Q = new Matrix(Q);

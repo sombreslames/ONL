@@ -47,8 +47,6 @@ public class ConjugateGradients extends Algorithm {
 		this.d  = this.f.grad(x0).minus();
 		super.start(x0);
 
-		/* TODO */
-		
 	}
 	
 	/**
@@ -58,16 +56,16 @@ public class ConjugateGradients extends Algorithm {
 	 */
 	public void compute_next() throws EndOfIteration {
 		
-		Vector gk = this.f.grad(this.iter_vec);
+		Vector gk = this.f.grad(iter_vec);
 		/* calcul de la nouvelle pos*/
-		double alpha =this.s.search(this.iter_vec, this.d);
+		double alpha = this.s.search(iter_vec, d);
+		Vector PosTemp = iter_vec.add(this.d.leftmul(alpha));
 		
-		iter_vec=this.iter_vec.add(this.d.leftmul(alpha));
 		
-		Vector gk1 = this.f.grad(this.iter_vec);
+		Vector gk1 = this.f.grad(PosTemp).minus();
 		/* Calcul de la nouvelle direction */
 		double Beta = Math.pow(gk1.norm(),2)/Math.pow(gk.norm(),2);
-		this.d = gk1.minus().add(this.d.leftmul(Beta));
-		
+		this.d = gk1.add(this.d.leftmul(Beta));
+		iter_vec= PosTemp;
 	}
 }

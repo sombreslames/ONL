@@ -10,7 +10,6 @@ public class Rosenbrock implements RealFunc {
 		/* TODO */
 		double x = v.get(0);
 		double y = v.get(1);
-		System.out.println(v);
 		return (Math.pow((1-x),2) + 100*Math.pow((y-Math.pow(x, 2)),2));
 	}
 

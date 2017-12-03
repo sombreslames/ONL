@@ -4,7 +4,7 @@ import line.SlopeIter;
 import solve.Algorithm;
 import solve.SteepestDescent;
 import solve.ConjugateGradients;
-
+import solve.QuasiNewton;
 import util.Vector;
 import util.Plot;
 import func.AlmostDiag;
@@ -38,16 +38,16 @@ public class Tp2 {
 		algo.setMaxIteration(N);
 		algo.start(x0);
 		double EvalTop = f.eval(xopt);
+		System.out.println("Running "+plotTitle+"\n");
 		do{
 			
 			i++;
 			it[i-1] = i;
-			gap[i-1] =  Math.log(f.eval(algo.current_vector())-EvalTop);
+			
 			
 			algo.next();
+			gap[i-1] =  Math.log(f.eval(algo.current_vector())-EvalTop);
 		}while(algo.hasNext());
-		/* TODO */
-		
 		/* Generate the graphic */
 		new Plot(plotTitle,"#iter","log(x-x*)",fileName,it,gap);
 	}
@@ -140,23 +140,59 @@ public class Tp2 {
 			new SlopeIter(rosenbrock)), "Conjugate gradients - Rosenbrock","conjgrad_rosenbrock.jpg");
 	}
 	
+	public static void newtonAlmostDiag() {
+		AlmostDiag almostDiag5=new AlmostDiag(5);
+		Vector zero5 = new Vector(new double[] {0,0,0,0,0});
+		Vector x0 = new Vector(new double[] {1,-2,-1,3,1});
+
+		run(almostDiag5, 
+			zero5,
+			x0,
+			new QuasiNewton(almostDiag5, 
+			new SlopeIter(almostDiag5)), "QuasiNewton- AlmostDiag","QuasiNewton_almostdiag.jpg");
+	}
+	public static void newtonRosenbrock() {
+		RealFunc rosenbrock  = new Rosenbrock();
+		Vector xopt          = new Vector(new double[] {1,1});
+		Vector x0            = new Vector(new double[] {1,2});
+		run(rosenbrock, 
+			xopt,
+			x0,
+			new QuasiNewton(rosenbrock, 
+			new SlopeIter(rosenbrock)), "QuasiNewton - Rosenbrock","QuasiNewton_rosenbrock.jpg");
+	}
 	
+	public static void newtonHilbert() {
+		RealFunc hilbert5=new Hilbert(5);
+		Vector zero5 = new Vector(new double[] {0,0,0,0,0});
+		Vector x0 = new Vector(new double[] {1,2,-1,3,1});
+
+		run(hilbert5, 
+				zero5,
+				x0,
+				new QuasiNewton(hilbert5, 
+				new SlopeIter(hilbert5)), "QuasiNewton - Hilbert","QuasiNewton_hilbert.jpg"); 
+	}
+		
 	public static void main(String[] args) {
 
-		steepestAlmostDiag1();
+//		steepestAlmostDiag1();
 //		
-		steepestAlmostDiag2();
+//		steepestAlmostDiag2();
 //		
-		steepestHilbert();
+//		steepestHilbert();
 //		
-		steepestRosenbrock();
+//		steepestRosenbrock();
 //		
-		conjgradAlmostDiag();
+//		conjgradAlmostDiag();
 //		
-		conjgradHilbert();
+//		conjgradHilbert();
 //		
-		conjgradRosenbrock();
-
+//		conjgradRosenbrock();
+		
+		newtonAlmostDiag();
+		newtonHilbert();
+		newtonRosenbrock();
 		
 	}
 }

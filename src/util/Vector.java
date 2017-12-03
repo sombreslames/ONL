@@ -193,13 +193,28 @@ public class Vector {
 	}
 	
 	/**
-	 * Check if components are exactyl the same
+	 * Check if components are exactly the same
 	 */
 	public boolean equals(Vector x) {
 		for (int i=0; i<n; i++) {
 			if (get(i)!=x.get(i)) return false;
 		}
 		return true;
+	}
+	/*
+	 * Produit de v*v'
+	 */
+	public Matrix MultEx(Vector v) {
+		Matrix M = new Matrix(this.size(),v.size());
+		for(int i = 0; i<this.size();i++)
+		{
+			for(int j = 0 ; j<v.size();j++)
+			{
+				M.set(i, j, this.get(i)*v.get(j));
+			}
+		}
+		M.toString();
+		return M;
 	}
 }
  
