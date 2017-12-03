@@ -30,6 +30,7 @@ public class QuasiNewton extends Algorithm {
 	}
 	@Override
 	protected void compute_next() throws EndOfIteration {
+		System.out.println("#######################################");
 		Vector Direction = new Vector(this.iter_vec.size());
 		Vector PosTemp 	= new Vector(this.iter_vec.size());
 		double alpha   	= 0.0;
@@ -44,7 +45,7 @@ public class QuasiNewton extends Algorithm {
 		Boolean GoodDirection = false;
 		Boolean AlrightThen = false;//Booleen pour l'adequation
 		Boolean GoGauchy = false;
-		
+
 		do {
 			GoGauchy 		= false;
 			GoodDirection 	= false;
@@ -53,7 +54,7 @@ public class QuasiNewton extends Algorithm {
 			alpha = this.s.search(this.iter_vec, Direction);
 			PosTemp = this.iter_vec.add(Direction.leftmul(alpha));
 			
-			if ( f.eval(PosTemp) <= f.eval(this.iter_vec) )
+			if ( f.eval(PosTemp) < f.eval(this.iter_vec) )
 			{
 				Rconf = this.iter_vec.sub(PosTemp).norm();				
 				if(Rconf > this.radius)
@@ -72,12 +73,25 @@ public class QuasiNewton extends Algorithm {
 			}
 			
 			if(GoGauchy){
+				
 				System.out.println("So we compute gauchy : ");
-				Vector GauchyDir = q.grad(this.iter_vec).leftmul(this.radius/q.grad(this.iter_vec).norm()).minus();
-				alpha = this.s.search(this.iter_vec, GauchyDir);
+				Vector TheOneWeShouldUse = q.grad(this.iter_vec);
+				Vector GauchyDir = TheOneWeShouldUse.leftmul(this.radius/TheOneWeShouldUse.norm()).minus();
+				//GAuchy dir based on f or QUadraForm q ?
+				if(this.A0.mult(TheOneWeShouldUse).scalar(TheOneWeShouldUse) <= 0) {
+					alpha=1;
+				}else {
+					alpha = Math.min(Math.pow(TheOneWeShouldUse.norm(), 3)/TheOneWeShouldUse.leftmul(this.radius).scalar(this.A0.mult(TheOneWeShouldUse)) , 1);
+				}
+				
+				
 				PosTemp = this.iter_vec.add(GauchyDir.leftmul(alpha));
 				GoodDirection = true;
 				/* Calcul intersection cercle de confiance et PosTemp de gauchy ? */
+				/* Verification si Gauchy diminue q ROSENBROCK NON DE DIEU*/ 
+				if (f.eval(PosTemp) >= f.eval(this.iter_vec)) {
+					System.out.println("Nop");
+				}
 			}
 			
 			
@@ -88,12 +102,14 @@ public class QuasiNewton extends Algorithm {
 				this.radius *= DELTA_RATIO;
 				this.iter_vec= PosTemp;
 				System.out.println("Good adequacy : "+Adequacy);
-				System.out.println("It is working !");
 			}else if (Adequacy < POOR_ADEQUACY)
 			{
 				System.out.println("Bad adequacy : "+Adequacy);
 				this.radius /= DELTA_RATIO;
 				AlrightThen = true;
+			}else {
+				this.iter_vec = PosTemp;
+				System.out.println("Average adequacy");
 			}
 		}while(AlrightThen && GoodDirection);
 		System.out.println("Iteration "+this.current_iteration());
@@ -105,7 +121,7 @@ public class QuasiNewton extends Algorithm {
 		/* Mise a jour des matricex SR1*/
 		/* DELTA COMPUTATION*/
 		Vector deltaX 		= this.iter_vec.sub(OldIter);
-		Vector deltaG 		= q.grad(this.iter_vec).sub(OldGrad);
+		Vector deltaG 		= f.grad(this.iter_vec).sub(OldGrad);
 		/* Error  */
 		Vector ErrorKA		= deltaG.sub(this.A0.mult(deltaX));
 		Vector ErrorKH		= deltaX.sub(this.H0.mult(deltaG));
@@ -119,16 +135,16 @@ public class QuasiNewton extends Algorithm {
 			this.A0	= this.A0.add(NEWA.leftmul((1/CurvatureA)));
 			Matrix NEWH = ErrorKH.MultEx(ErrorKH);
 			this.H0 = this.H0.add(NEWH.leftmul((1/CurvatureH)));
-			System.out.println("Mise a jour des matrices effectue\n");
+			System.out.println("Matrix updated\n");
 		}
 		
-		/*if(q.grad(this.iter_vec).norm() < GRADIENT_MIN_NORM || this.radius == DELTA_MIN) {
+		if(q.grad(this.iter_vec).norm() < GRADIENT_MIN_NORM || this.radius == DELTA_MIN) {
 			System.out.println("STOP CONDITION FULLFILLED :");
 			System.out.println("Grad val : "+f.grad(this.iter_vec).norm());
 			System.out.println("Radius "+this.radius + "\n");
 			throw new EndOfIteration();
 		}
-		**/
+		
 	}
 
 	/* *

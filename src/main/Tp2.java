@@ -48,6 +48,8 @@ public class Tp2 {
 			algo.next();
 			gap[i-1] =  Math.log(f.eval(algo.current_vector())-EvalTop);
 		}while(algo.hasNext());
+		
+		System.out.println("Best value found : "+f.eval(algo.current_vector()));
 		/* Generate the graphic */
 		new Plot(plotTitle,"#iter","log(x-x*)",fileName,it,gap);
 	}
@@ -184,11 +186,11 @@ public class Tp2 {
 //		
 //		steepestRosenbrock();
 //		
-//		conjgradAlmostDiag();
+		conjgradAlmostDiag();
 //		
-//		conjgradHilbert();
+		conjgradHilbert();
 //		
-//		conjgradRosenbrock();
+		conjgradRosenbrock();
 		
 		newtonAlmostDiag();
 		newtonHilbert();
